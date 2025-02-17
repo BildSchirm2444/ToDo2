@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do Liste</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+        .delete {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do Liste</h1>
+        <input type="text" id="taskInput" placeholder="Neue Aufgabe...">
+        <button onclick="addTask()">Hinzufügen</button>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        // Aufgaben aus dem Local Storage laden
+        document.addEventListener('DOMContentLoaded', loadTasks);
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskList = document.getElementById('taskList');
+
+            if (taskInput.value.trim() === '') {
+                alert('Bitte eine Aufgabe eingeben!');
+                return;
+            }
+
+            const li = document.createElement('li');
+            li.innerHTML = `${taskInput.value} <span class="delete" onclick="removeTask(this)">×</span>`;
+            taskList.appendChild(li);
+
+            saveTasks(); // Aufgaben speichern
+            taskInput.value = '';
+        }
+
+        function removeTask(element) {
+            element.parentElement.remove();
+            saveTasks(); // Aufgaben nach dem Entfernen speichern
+        }
+
+        function saveTasks() {
+            const tasks = [];
+            document.querySelectorAll('#taskList li').forEach(li => {
+                tasks.push(li.textContent.replace('×', '').trim());
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const taskList = document.getElementById('taskList');
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.innerHTML = `${task} <span class="delete" onclick="removeTask(this)">×</span>`;
+                taskList.appendChild(li);
+            });
+        }
+
+        document.getElementById('taskInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
